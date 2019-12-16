@@ -25,7 +25,7 @@ router.post('/register', (req, res, next) => {
             const token = jwt.sign({ email: email }, 'cmsgituloh');
             const user = new User({
               email: req.body.email,
-              password: req.body.password,
+              password: hash,
               token: token
             })
             user.save().then(data => {
@@ -38,7 +38,7 @@ router.post('/register', (req, res, next) => {
               res.status(201).json(response);
             }).catch(err => {
               response.message = 'Email or Password is not valid';
-              res.json(response)
+              res.status(500).json(err);
             })
           }
         })
@@ -48,6 +48,38 @@ router.post('/register', (req, res, next) => {
     response.message = 'Password is not match';
     res.json(response);
   }
+});
+
+router.post('/check', (req, res, next) => {
+  let header = req.headers.authorization
+  console.log('head ' + header)
+  let response = {
+    valid: false
+  }
+  if (typeof header !== undefined) {
+    let checkToken = jwt.verify(header, 'cmsgituloh')
+    User.find({ email: checkToken.email }).then(result => {
+      if (result) {
+        response.valid = true;
+        res.status(200).json(response);
+      } else {
+        res.status(500).json(err);
+      }
+    }).catch(err => {
+      res.status(500).json(err);
+    })
+  } else {
+    res.status(500).json(err);
+  }
+})
+
+router.get('/list', (req, res, next) => {
+  User.find().then(response => {
+    res.status(200).json(response);
+  })
+    .catch(err => {
+      res.status(500).json(err);
+    });
 });
 
 module.exports = router;
