@@ -29,11 +29,9 @@ router.post('/register', (req, res, next) => {
               token: token
             })
             user.save().then(data => {
-              console.log('data ' + data)
               response.status = true;
               response.message = 'Register success';
               response.data.email = email;
-              response.data.password = password;
               response.token = token;
               res.status(201).json(response);
             }).catch(err => {
@@ -50,28 +48,49 @@ router.post('/register', (req, res, next) => {
   }
 });
 
-router.post('/check', (req, res, next) => {
-  let header = req.headers.authorization
-  console.log('head ' + header)
+router.post('/login', (req, res, next) => {
+  const { email, password } = req.body;
   let response = {
-    valid: false
+    status: false,
+    message: '',
+    data: {},
+    token: ''
   }
-  if (typeof header !== undefined) {
-    let checkToken = jwt.verify(header, 'cmsgituloh')
-    User.find({ email: checkToken.email }).then(result => {
-      if (result) {
-        response.valid = true;
-        res.status(200).json(response);
-      } else {
-        res.status(500).json(err);
-      }
-    }).catch(err => {
-      res.status(500).json(err);
-    })
-  } else {
-    res.status(500).json(err);
-  }
-})
+
+  User.find({ email }).then(result => {
+    if (result) {
+      bcrypt.compare(password, result[0].password, (err, data) => {
+        if (err) {
+          response.message = 'Auth Failed'
+          res.status(401).json(response)
+        } else if (data) {
+          const newToken = jwt.sign({ email: email }, 'cmsgituloh');
+          response.status = true;
+          response.message = 'Log in success';
+          response.data.email = email;
+          response.token = newToken;
+          User.updateOne({ email }, { token: newToken }, ((err) => {
+            if (err) {
+              response.message = 'Error!';
+              res.status(401).json(response);
+            } else {
+              res.status(200).json(response);
+            }
+          })) 
+        } else {
+          response.message = 'Wrong email or password'
+          res.status(401).json(response);
+        }
+      })
+    } else {
+      response.message = 'Auth failed';
+      res.status(401).json(response);
+    }
+  }).catch(err => {
+    response.message = 'Email or password is not valid';
+    res.json(response);
+  })
+});
 
 router.get('/list', (req, res, next) => {
   User.find().then(response => {
@@ -80,6 +99,15 @@ router.get('/list', (req, res, next) => {
     .catch(err => {
       res.status(500).json(err);
     });
+});
+
+router.post('/check', (req, res, next) => {
+  let header = req.headers.authorization
+  console.log('head ' + header)
+});
+
+router.post('/logout', (req, res, next) => {
+  let header = req.headers.authorization
 });
 
 module.exports = router;
