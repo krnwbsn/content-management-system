@@ -123,7 +123,7 @@ describe('data', function () {
             });
     });
 
-    it('seharusnya menghapus satu data id path /api/users/<id> DELETE', function (done) {
+    it('seharusnya menghapus satu data dari path /api/data/<id> DELETE', function (done) {
         chai.request(server)
             .get('/api/data')
             .end(function (err, data) {
@@ -146,12 +146,12 @@ describe('data', function () {
             });
     });
 
-    it('seharusnya menghapus satu user id path /api/users/<id> DELETE', function (done) {
+    it('seharusnya mencari satu data dari path /api/data/<id> DELETE', function (done) {
         chai.request(server)
             .get('/api/data')
             .end(function (err, data) {
                 chai.request(server)
-                    .delete(`/api/data/${data.body[0]._id}`)
+                    .get(`/api/data/${data.body[0]._id}`)
                     .end(function (error, response) {
                         response.should.have.status(201);
                         response.body.should.be.a('object');
