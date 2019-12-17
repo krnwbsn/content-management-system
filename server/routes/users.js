@@ -102,7 +102,7 @@ router.get('/list', (req, res, next) => {
 });
 
 router.post('/check', (req, res, next) => {
-  const header = req.headers.authorization
+  let header = req.headers.authorization
   let response = {
     valid: false
   }
@@ -127,7 +127,7 @@ router.post('/check', (req, res, next) => {
 });
 
 router.post('/destroy', (req, res, next) => {
-  const header = req.headers.authorization
+  let header = req.headers.authorization
   let response = {
     logout: false
   }
