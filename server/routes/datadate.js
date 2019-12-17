@@ -3,7 +3,7 @@ var router = express.Router();
 const Datadate = require('../models/datadate');
 
 router.post('/search', (req, res, next) => {
-    let { letter, frequency } = req.body;
+    const { letter, frequency } = req.body;
     let response = {
         message: ''
     }
@@ -94,6 +94,26 @@ router.delete('/:id', (req, res, next) => {
         res.status(201).json(response);
     }).catch(err => {
         response.message = 'datadate not deleted';
+        res.status(500).json(err);
+    })
+});
+
+router.get('/:id', (req, res, next) => {
+    let id = req.params.id;
+    let response = {
+        success: false,
+        message: '',
+        data: {}
+    }
+    Datadate.findById(id).then(result => {
+        response.success = true;
+        response.message = 'Datadate found';
+        response.data._id = id;
+        response.data.letter = result.letter;
+        response.data.frequency = result.frequency;
+        res.status(201).json(response);
+    }).catch(err => {
+        response.message = 'Datadate not found';
         res.status(500).json(err);
     })
 });

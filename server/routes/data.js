@@ -3,7 +3,7 @@ var router = express.Router();
 const Data = require('../models/data');
 
 router.post('/search', (req, res, next) => {
-    let { letter, frequency } = req.body;
+    const { letter, frequency } = req.body;
     let response = {
         message: ''
     }
@@ -44,7 +44,7 @@ router.post('/', (req, res, next) => {
         data.save().then(result => {
             response.success = true;
             response.message = 'data have been added';
-            response.data._id = result.id
+            response.data._id = result.id;
             response.data.letter = result.letter;
             response.data.frequency = result.frequency;
             res.status(201).json(response);
@@ -66,16 +66,17 @@ router.put('/:id', (req, res, next) => {
         data: {}
     }
     Data.findOneAndUpdate(
-        { _id: req.params.id }, { letter: letter, frequency: frequency }, { new: true }
+        { _id: req.params.id }, { letter: letter, frequency: frequency }
     ).then(result => {
         response.success = true;
         response.message = 'data have been updated';
         response.data.letter = letter;
         response.data.frequency = frequency;
+        response.data._id = req.params.id;
         res.status(201).json(response);
     }).catch(err => {
-        response.message = 'data not modified'
-        res.status(500).json(err);
+        response.message = 'data not deleted';
+        console.log(err)
     })
 });
 
@@ -91,11 +92,34 @@ router.delete('/:id', (req, res, next) => {
         response.success = true;
         response.message = 'data has been deleted';
         response.data._id = req.params.id;
+        response.data.letter = result.letter;
+        response.data.frequency = result.frequency;
         res.status(201).json(response);
     }).catch(err => {
         response.message = 'data not deleted';
-        res.status(500).json(err);
+        console.log(err)
     })
 });
+
+router.get('/:id', (req, res, next) => {
+    let response = {
+        success: false,
+        message: '',
+        data: {}
+    }
+    Data.findById(
+        { _id: req.params.id }
+    ).then(result => {
+        response.success = true;
+        response.message = 'data has been deleted';
+        response.data._id = req.params.id;
+        response.data.letter = result.letter;
+        response.data.frequency = result.frequency;
+        res.status(201).json(response);
+    }).catch(err => {
+        response.message = 'data not deleted';
+        console.log(err)
+    })
+})
 
 module.exports = router;
