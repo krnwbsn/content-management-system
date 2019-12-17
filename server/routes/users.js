@@ -126,8 +126,26 @@ router.post('/check', (req, res, next) => {
   }
 });
 
-router.post('/logout', (req, res, next) => {
+router.post('/destroy', (req, res, next) => {
   let header = req.headers.authorization
+  let response = {
+    logout: false
+  }
+  if (typeof header !== undefined) {
+    let checkToken = jwt.verify(header, 'cmsgituloh')
+    User.findOneAndUpdate({ email: checkToken.email }, { token: '' }).exec().then(result => {
+      if (result) {
+        response.logout = true
+        res.status(200).json(response)
+      } else {
+        res.status(500).json(response)
+      }
+    }).catch(err => {
+      res.status(500).json(response)
+    })
+  } else {
+    res.status(500).json(response)
+  }
 });
 
 module.exports = router;
