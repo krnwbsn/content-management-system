@@ -64,7 +64,7 @@ router.post('/login', (req, res, next) => {
           response.message = 'Auth Failed'
           res.status(401).json(response)
         } else if (data) {
-          const newToken = jwt.sign({ email: email }, 'cmsgituloh');
+          const newToken = jwt.sign({ email: result[0].email, id: result[0]._id }, 'cmsgituloh');
           response.status = true;
           response.message = 'Log in success';
           response.data.email = email;
@@ -103,7 +103,27 @@ router.get('/list', (req, res, next) => {
 
 router.post('/check', (req, res, next) => {
   let header = req.headers.authorization
-  console.log('head ' + header)
+  let response = {
+    valid: false
+  }
+
+  if (typeof header !== undefined) {
+    let checkToken = jwt.verify(header, 'cmsgituloh')
+    console.log(checkToken);
+    User.find({ email: checkToken.email }).then(result => {
+      console.log(result);
+      if (result) {
+        response.valid = true
+        res.status(200).json(response)
+      } else {
+        res.status(500).json(response)
+      }
+    }).catch(err => {
+      res.status(500).json(response)
+    })
+  } else {
+    res.status(500).json(response)
+  }
 });
 
 router.post('/logout', (req, res, next) => {

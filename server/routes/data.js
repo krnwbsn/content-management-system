@@ -21,7 +21,6 @@ router.post('/search', (req, res, next) => {
     }
 });
 
-// read data
 router.get('/', (req, res, next) => {
     Data.find().then(result => {
         res.status(200).json(result);
@@ -30,7 +29,6 @@ router.get('/', (req, res, next) => {
     });
 });
 
-// add data
 router.post('/', (req, res, next) => {
     const { letter, frequency } = req.body;
     let response = {
@@ -60,7 +58,6 @@ router.post('/', (req, res, next) => {
     }
 })
 
-// edit data
 router.put('/:id', (req, res, next) => {
     const { letter, frequency } = req.body;
     let response = {
@@ -82,7 +79,6 @@ router.put('/:id', (req, res, next) => {
     })
 });
 
-// delete data
 router.delete('/:id', (req, res, next) => {
     let response = {
         success: false,
