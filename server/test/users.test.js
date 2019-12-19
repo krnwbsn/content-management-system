@@ -84,6 +84,7 @@ describe('users', function () {
       .end(function (err, res) {
         chai.request(server)
           .post('/api/users/check')
+          .set('Authorization', res.body.token)
           .end(function (error, response) {
             response.should.have.status(200);
             response.should.be.json;
@@ -95,7 +96,7 @@ describe('users', function () {
   //#5 DESTROY
   it('Seharusnya dapat destroy token ketika melakukan logout dengan metode GET', function (done) {
     chai.request(server)
-      .post('/apu/users/login')
+      .post('/api/users/login')
       .send({
         'email': 'user@gmail.com',
         'password': '1234'
@@ -103,9 +104,10 @@ describe('users', function () {
       .end(function (err, res) {
         chai.request(server)
           .get('/api/users/destroy')
-          .set('Authorization', res.body.token)
-          .end(function (err, res) {
+          .set('Authorization', req.headers.authorization)
+          .end(function (error, response) {
             response.should.have.status(200);
+            response.should.be.json;
             done();
           })
       })
