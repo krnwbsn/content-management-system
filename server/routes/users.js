@@ -33,8 +33,9 @@ router.post('/register', (req, res, next) => {
               response.status = true;
               response.message = 'Register success';
               response.data.email = email;
+              response.data.password = password;
               response.token = token;
-              res.status(201).json(response);
+              res.json(response);
             }).catch(err => {
               response.message = 'Email or Password is not valid';
               res.status(500).json(err);
@@ -49,6 +50,7 @@ router.post('/register', (req, res, next) => {
   }
 });
 
+// login
 router.post('/login', (req, res, next) => {
   const { email, password } = req.body;
   let response = {
@@ -69,6 +71,7 @@ router.post('/login', (req, res, next) => {
           response.status = true;
           response.message = 'Log in success';
           response.data.email = email;
+          response.data.password = password;
           response.token = newToken;
           User.updateOne({ email }, { token: newToken }, ((err) => {
             if (err) {
@@ -103,6 +106,7 @@ router.get('/list', (req, res, next) => {
     });
 });
 
+// check
 router.post('/check', (req, res, next) => {
   let header = req.headers.authorization
   let response = {
