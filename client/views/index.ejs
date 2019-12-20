@@ -1,25 +1,19 @@
 <% include partials/header %>
-
-<div class="d-flex justify-content-center align-items-center">
-
-  <div class="card border-primary mt-3" style="width: 50rem;">
-    <h5 class="card-header text-white bg-primary"><i class="fa fa-bookmark"></i> Welcome To Dashboard </h5>
-    <div class="card-body">
-
-      <a href="" class="btn btn-danger btn-lg btn-block"><i class="fa fa-signal"></i><br>Line</a>
-      <a href="" class="btn btn-warning btn-lg btn-block"><i class="fa fa-pie-chart"></i><br> Pie</a>
-      <a href="" class="btn btn-primary btn-lg btn-block"><i class="fa fa-bar-chart"></i><br> Bar</a>
-      <a href="" class="btn btn-success btn-lg btn-block"><i class="fa fa-globe"></i><br> Maps</a>
-      <a href="" class="btn btn-info btn-lg btn-block"><i class="fa fa-user"></i> Admin Panel</a>
-
-
-    </div>
+<% include partials/navbar %>
+<div class="container">
+  <div class="d-flex justify-content-center align-items-center">
+    <main role="main" class="inner cover dashboard-main">
+      <div class="card border-primary mt-3" style="width: 50rem;">
+        <h5 class="card-header text-white bg-primary"><i class="fa fa-bookmark"></i> Welcome To Dashboard </h5>
+        <div class="card-body">
+          <a href="/line" class="btn btn-danger btn-lg btn-block"><i class="fa fa-signal"></i><br>Line</a>
+          <a href="/pie" class="btn btn-warning btn-lg btn-block"><i class="fa fa-pie-chart"></i><br> Pie</a>
+          <a href="/bar" class="btn btn-primary btn-lg btn-block"><i class="fa fa-bar-chart"></i><br> Bar</a>
+          <a href="/map" class="btn btn-success btn-lg btn-block"><i class="fa fa-globe"></i><br> Maps</a>
+          <a href="/login" class="btn btn-info btn-lg btn-block"><i class="fa fa-user"></i> Admin Panel</a>
+        </div>
+      </div>
+    </main>
   </div>
-
 </div>
-
-
-
-
-<% include partials/script %>
 <% include partials/footer %>

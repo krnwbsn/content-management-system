@@ -2,24 +2,40 @@ var express = require('express');
 var router = express.Router();
 
 /* GET home page. */
-router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Express' });
+router.get('/', function (req, res) {
+  res.render('index');
 });
 
-router.get('/home', function(req, res) {
+router.get('/home', function (req, res) {
   res.render('home');
 });
 
-router.get('/data', function(req, res) {
+router.get('/data', function (req, res) {
   res.render('data');
 });
 
-router.get('/data-date', function(req, res) {
-  res.render('data-date');
+router.get('/datadate', function (req, res) {
+  res.render('datadate');
 });
 
-router.get('/maps', function(req, res) {
+router.get('/line', function (req, res) {
+  res.render('line');
+});
+
+router.get('/bar', function (req, res) {
+  res.render('bar');
+});
+
+router.get('/pie', function (req, res) {
+  res.render('pie');
+});
+
+router.get('/maps', function (req, res) {
   res.render('maps');
+});
+
+router.get('/map', function (req, res) {
+  res.render('map');
 });
 
 module.exports = router;

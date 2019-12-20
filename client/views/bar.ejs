@@ -1,0 +1,65 @@
+<% include partials/header %>
+<% include partials/navbar %>
+<div class="container">
+    <main role="main" class="inner cover dashboard-main">
+        <div class="card">
+            <div class="card-header">
+                <div class="row justify-content-between">
+                    <h5>
+                        Bar Chart
+                    </h5>
+                </div>
+            </div>
+            <div class="card-body">
+                <div id="chart"></div>
+            </div>
+        </div>
+    </main>
+</div>
+<% include partials/footer %>
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script type="text/javascript">
+    const googleChart = (data) => {
+        google.charts.load('current', { 'packages': ['bar'] });
+        google.charts.setOnLoadCallback(drawChart);
+
+        function drawChart() {
+            var data = google.visualization.arrayToDataTable([
+                ['Letter', 'Frequency'],
+                ...data
+            ]);
+
+            var options = {
+                width: 1000,
+                legend: { position: 'none' },
+                axes: {
+                    x: { 0: { side: 'bottom', label: 'Letter' } },
+                    y: { 0: { side: 'left', label: 'Frequency' } }
+                },
+                bar: { groupWidth: '90%' }
+            };
+
+            var chart = new google.charts.Bar(document.getElementById('barchart_material'));
+
+            chart.draw(data, google.charts.Bar.convertOptions(options));
+        }
+    }
+
+    const urlData = 'http://localhost:3000/api/data/bar';
+    const getDataDate = () => {
+        $.ajax({
+            url: urldata,
+            method: 'GET'
+        }).done(datadate => {
+            let arr = datadate.map(value => {
+                return [value._id, value.total];
+            });
+            googleChart(arr);
+        });
+    };
+
+    $(() => {
+        getDataDate();
+    })
+
+</script>
