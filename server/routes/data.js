@@ -2,11 +2,12 @@ var express = require('express');
 var router = express.Router();
 const Data = require('../models/data');
 
+// search
 router.post('/search', (req, res, next) => {
     let { letter, frequency } = req.body;
     let response = {
         message: ''
-    }
+    };
     if (letter != undefined || frequency.toString() != 'NaN') {
         let filterData = {};
         letter ? filterData.letter = { $regex: letter, $options: 'i' } : undefined;
@@ -14,109 +15,134 @@ router.post('/search', (req, res, next) => {
 
         Data.find(filterData).then(data => {
             res.json(data);
-        }).catch(err => res.status(400).json(err));
+        }).catch(err => res.status(500).json(err));
     } else {
-        response.message = 'Search data cannot be empty'
-        res.status(400).json(response)
-    }
+        response.message = 'search data cannot be empty'
+        res.status(500).json(response)
+    };
 });
 
+// get list
 router.get('/', (req, res, next) => {
-    Data.find().then(result => {
-        res.status(200).json(result);
+    Data.find().then(data => {
+        res.json(data);
     }).catch(err => {
         res.status(500).json(err);
     });
 });
 
+// bar
+router.get('/bar', function (req, res) {
+    Data.aggregate().group(
+        {
+            _id: "$letter",
+            total: { $sum: "$frequency" }
+        }
+    ).then((data) => {
+        res.json(data);
+    }).catch(err => {
+        res.status(500).json(response);
+    });
+});
+
+// add
 router.post('/', (req, res, next) => {
     const { letter, frequency } = req.body;
     let response = {
         success: false,
         message: '',
         data: { _id: '', letter: '', frequency: null }
-    }
+    };
     if (letter != undefined || frequency != undefined) {
         const data = new Data({
             letter,
             frequency
         })
         data.save().then(result => {
+            console.log(result)
             response.success = true;
             response.message = 'data have been added';
-            response.data._id = result.id
+            response.data._id = result._id;
             response.data.letter = result.letter;
             response.data.frequency = result.frequency;
             res.status(201).json(response);
         }).catch(err => {
-            response.message = 'letter and frequency cannot be empty'
-            res.status(400).json(response)
-        })
+            response.message = 'failed to add some data'
+            res.status(500).json(err)
+        });
     } else {
-        response.message = 'Add data cannot be empty'
-        res.status(400).json(response)
-    }
-})
+        response.message = 'letter and frequency cannot be empty'
+        res.status(500).json(response)
+    };
+});
 
+// edit
 router.put('/:id', (req, res, next) => {
     const { letter, frequency } = req.body;
     let response = {
         success: false,
         message: '',
         data: {}
-    }
-    Data.findOneAndUpdate(
-        { _id: req.params.id }, { letter: letter, frequency: frequency }, { new: true }
-    ).then(result => {
-        response.success = true;
-        response.message = 'data have been updated';
-        response.data.letter = letter;
-        response.data.frequency = frequency;
-        res.status(201).json(response);
-    }).catch(err => {
-        response.message = 'data not modified';
-        console.log(err)
-    })
+    };
+    if (letter != undefined || frequency != undefined) {
+        let editData = {};
+        letter ? editData.letter = letter : '';
+        frequency ? editData.frequency = frequency : '';
+
+        Data.findByIdAndUpdate(req.params.id, editData).exec().then(before => {
+            response.success = true;
+            response.message = 'data have been update';
+            response.data._id = req.params.id;
+            response.data.letter = letter;
+            response.data.frequency = frequency;
+            res.status(201).json(response);
+        });
+    } else {
+        response.message = 'field cannot be empty';
+        res.status(500).json(response);
+    };
 });
 
+// delete
 router.delete('/:id', (req, res, next) => {
     let response = {
         success: false,
         message: '',
         data: {}
     }
-    Data.findOneAndRemove(
-        { _id: req.params.id }
-    ).then(result => {
-        response.success = true;
-        response.message = 'data has been deleted';
-        response.data._id = req.params.id;
-        res.status(201).json(response);
-    }).catch(err => {
-        response.message = 'data not deleted';
-        res.status(500).json(err);
-    })
+    Data.findByIdAndDelete(req.params.id).exec().then(before => {
+        if (before) {
+            response.success = true;
+            response.message = 'data have been deleted';
+            response.data._id = req.params.id;
+            response.data.letter = before.letter;
+            response.data.frequency = before.frequency;
+            res.status(201).json(response);
+        } else {
+            response.message = 'deleted failed, no data found';
+            res.status(500).json(response);
+        }
+    });
 });
 
+// browse
 router.get('/:id', (req, res, next) => {
     let response = {
         success: false,
         message: '',
         data: {}
     }
-    Data.findById(
-        { _id: req.params.id }
-    ).then(result => {
+    Data.findById(req.params.id).exec().then(result => {
         response.success = true;
-        response.message = 'data has been deleted';
+        response.message = 'data found';
         response.data._id = req.params.id;
         response.data.letter = result.letter;
         response.data.frequency = result.frequency;
-        res.status(201).json(response);
+        res.status(200).json(response);
     }).catch(err => {
         response.message = 'data not found';
-        console.log(err)
-    })
-})
+        res.status(500).json(err)
+    });
+});
 
 module.exports = router;

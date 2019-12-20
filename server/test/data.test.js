@@ -26,6 +26,7 @@ describe('data', function () {
         done();
     });
 
+    // search
     it('seharusnya mendapatkan daftar data yang ada di table data jika search letter dan frequency dengan metode POST', function (done) {
         chai.request(server)
             .post('/api/data/search')
@@ -46,7 +47,8 @@ describe('data', function () {
             });
     });
 
-    it('seharusnya mendapatkan daftar data yang ada di table data jika search letter dan frequency dengan metode POST', function (done) {
+    // search
+    it('seharusnya mendapatkan daftar data yang ada di table data jika search letter dengan metode POST', function (done) {
         chai.request(server)
             .post('/api/data/search')
             .send({
@@ -65,7 +67,8 @@ describe('data', function () {
             });
     });
 
-    it('seharusnya mendapatkan daftar data yang ada di table data jika search letter dan frequency dengan metode POST', function (done) {
+    // search
+    it('seharusnya mendapatkan daftar data yang ada di table data jika search frequency dengan metode POST', function (done) {
         chai.request(server)
             .post('/api/data/search')
             .send({
@@ -84,6 +87,7 @@ describe('data', function () {
             });
     });
 
+    // get list
     it('seharusnya mendapatkan semua daftar data yang ada di table datas dengan metode GET', function (done) {
         chai.request(server)
             .get('/api/data')
@@ -100,29 +104,31 @@ describe('data', function () {
             });
     });
 
+    // edit data
     it('seharusnya bisa memperbaharui data melalui path /api/data/<id> PUT', function (done) {
         chai.request(server)
             .get('/api/data')
             .end(function (err, data) {
                 chai.request(server)
                     .put(`/api/data/${data.body[0]._id}`)
-                    .send({ 'letter': data.body[0].letter, 'frequency': 1.5 })
+                    .send({ 'letter': 'B', 'frequency': data.body[0].frequency })
                     .end(function (error, response) {
                         response.should.have.status(201);
                         response.body.should.be.a('object');
                         response.body.should.have.property('success');
                         response.body.should.have.property('message');
                         response.body.should.have.property('data');
+                        response.body.data.should.have.property('_id');
                         response.body.data.should.have.property('letter');
                         response.body.data.should.have.property('frequency');
-                        response.body.data.should.have.property('_id');
-                        response.body.data.letter.should.equal('A');
-                        response.body.data.frequency.should.equal(1.5);
+                        response.body.data.letter.should.equal('B');
+                        response.body.data.frequency.should.equal(1.1);
                         done();
                     });
             });
     });
 
+    // delete
     it('seharusnya menghapus satu data dari path /api/data/<id> DELETE', function (done) {
         chai.request(server)
             .get('/api/data')
@@ -146,6 +152,7 @@ describe('data', function () {
             });
     });
 
+    // browse
     it('seharusnya mencari satu data dari path /api/data/<id> GET', function (done) {
         chai.request(server)
             .get('/api/data')
@@ -153,7 +160,7 @@ describe('data', function () {
                 chai.request(server)
                     .get(`/api/data/${data.body[0]._id}`)
                     .end(function (error, response) {
-                        data.should.have.status(201);
+                        data.should.have.status(200);
                         response.body.should.be.a('object');
                         response.body.should.have.property('success');
                         response.body.should.have.property('message');
