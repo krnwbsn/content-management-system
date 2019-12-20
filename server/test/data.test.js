@@ -146,14 +146,14 @@ describe('data', function () {
             });
     });
 
-    it('seharusnya mencari satu data dari path /api/data/<id> DELETE', function (done) {
+    it('seharusnya mencari satu data dari path /api/data/<id> GET', function (done) {
         chai.request(server)
             .get('/api/data')
             .end(function (err, data) {
                 chai.request(server)
                     .get(`/api/data/${data.body[0]._id}`)
                     .end(function (error, response) {
-                        response.should.have.status(201);
+                        data.should.have.status(201);
                         response.body.should.be.a('object');
                         response.body.should.have.property('success');
                         response.body.should.have.property('message');

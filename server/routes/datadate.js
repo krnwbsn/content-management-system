@@ -75,7 +75,7 @@ router.put('/:id', (req, res, next) => {
         res.status(201).json(response);
     }).catch(err => {
         response.message = 'datadate not modified'
-        res.status(500).json(err);
+        console.log(err)
     });
 });
 
@@ -94,7 +94,7 @@ router.delete('/:id', (req, res, next) => {
         res.status(201).json(response);
     }).catch(err => {
         response.message = 'datadate not deleted';
-        res.status(500).json(err);
+        console.log(err)
     })
 });
 
@@ -114,7 +114,7 @@ router.get('/:id', (req, res, next) => {
         res.status(201).json(response);
     }).catch(err => {
         response.message = 'Datadate not found';
-        res.status(500).json(err);
+        console.log(err)
     })
 });
 

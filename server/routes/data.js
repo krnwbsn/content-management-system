@@ -75,7 +75,7 @@ router.put('/:id', (req, res, next) => {
         response.data._id = req.params.id;
         res.status(201).json(response);
     }).catch(err => {
-        response.message = 'data not deleted';
+        response.message = 'data not modified';
         console.log(err)
     })
 });
@@ -117,7 +117,7 @@ router.get('/:id', (req, res, next) => {
         response.data.frequency = result.frequency;
         res.status(201).json(response);
     }).catch(err => {
-        response.message = 'data not deleted';
+        response.message = 'data not found';
         console.log(err)
     })
 })

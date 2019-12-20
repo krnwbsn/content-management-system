@@ -14,11 +14,10 @@ router.post('/search', (req, res, next) => {
         lng ? filterData.lng = Number(lng) : undefined;
 
         Map.find(filterData).then(result => {
-            res.json(result);
-        }).catch(err => res.status(400).json(err));
+            res.status(200).json(result);
+        }).catch(err => console.log(err));
     } else {
-        response.message = 'Seacrh map cannot be empty'
-        res.status(400).json(response)
+        response.message = 'Search map cannot be empty'
     }
 });
 
@@ -76,7 +75,8 @@ router.put('/:id', (req, res, next) => {
         response.data.lng = lng;
         res.status(201).json(response);
     }).catch(err => {
-        res.status(500).json(err);
+        response.message = 'Data not modified';
+        console.log(err)
     })
 });
 
@@ -94,7 +94,8 @@ router.delete('/:id', (req, res, next) => {
         response.data._id = req.params.id;
         res.status(201).json(response);
     }).catch(err => {
-        res.status(500).json(err);
+        response.message = 'Data not deleted'
+        console.log(err)
     })
 });
 
@@ -115,7 +116,7 @@ router.get('/:id', (req, res, next) => {
         res.status(201).json(response);
     }).catch(err => {
         response.message = 'Datadate not found';
-        res.status(500).json(err);
+        console.log(err)
     })
 });
 
