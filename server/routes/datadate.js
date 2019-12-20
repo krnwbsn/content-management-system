@@ -2,11 +2,12 @@ var express = require('express');
 var router = express.Router();
 const Datadate = require('../models/datadate');
 
+// search
 router.post('/search', (req, res, next) => {
     const { letter, frequency } = req.body;
     let response = {
         message: ''
-    }
+    };
     if (letter != undefined || frequency.toString() != 'NaN') {
         let filterData = {};
         letter ? filterData.letter = { $regex: letter, $options: 'i' } : undefined;
@@ -14,13 +15,14 @@ router.post('/search', (req, res, next) => {
 
         Datadate.find(filterData).then(data => {
             res.json(data);
-        }).catch(err => res.status(400).json(err));
+        }).catch(err => res.status(500).json(err));
     } else {
-        response.message = 'Search datadate cannot be empty'
-        res.status(400).json(response)
-    }
+        response.message = 'search data cannot be empty'
+        res.status(500).json(response)
+    };
 });
 
+// get list
 router.get('/', (req, res, next) => {
     Datadate.find().then(result => {
         res.status(200).json(result);
@@ -29,6 +31,7 @@ router.get('/', (req, res, next) => {
     });
 });
 
+// add
 router.post('/', (req, res, next) => {
     const { letter, frequency } = req.body;
     let response = {
@@ -43,79 +46,88 @@ router.post('/', (req, res, next) => {
         })
         datadate.save().then(result => {
             response.success = true;
-            response.message = 'datadate have been added';
-            response.data._id = result.id
+            response.message = 'data have been added';
+            response.data._id = result._id
             response.data.letter = result.letter;
             response.data.frequency = result.frequency;
             res.status(201).json(response);
         }).catch(err => {
-            response.message = 'letter and frequency cannot be empty'
-            res.status(400).json(response)
+            response.message = 'failed to add'
+            res.status(500).json(err)
         })
     } else {
-        response.message = 'Add datadate cannot be empty'
-        res.status(400).json(response)
-    }
+        response.message = 'letter and frequency cannot be empty'
+        res.status(500).json(response)
+    };
 });
 
+// edit
 router.put('/:id', (req, res, next) => {
     const { letter, frequency } = req.body;
     let response = {
         success: false,
         message: '',
         data: {}
-    }
-    Datadate.findOneAndUpdate(
-        { _id: req.params.id }, { letter: letter, frequency: frequency }, { new: true }
-    ).then(result => {
-        response.success = true;
-        response.message = 'datadate have been updated';
-        response.data.letter = letter;
-        response.data.frequency = frequency;
-        res.status(201).json(response);
-    }).catch(err => {
-        response.message = 'datadate not modified'
-        console.log(err)
-    });
+    };
+    if (letter != undefined || frequency != undefined) {
+        let editData = {};
+        letter ? editData.letter = letter : '';
+        frequency ? editData.frequency = frequency : '';
+
+        Datadate.findByIdAndUpdate(req.params.id, editData).exec().then(before => {
+            response.success = true;
+            response.message = 'data have been update';
+            response.data._id = req.params.id;
+            response.data.letter = letter;
+            response.data.frequency = frequency;
+            res.status(201).json(response);
+        })
+    } else {
+        response.message = 'field cannot be empty';
+        res.status(500).json(response);
+    };
 });
 
+// delete
 router.delete('/:id', (req, res, next) => {
     let response = {
         success: false,
         message: '',
         data: {}
     }
-    Datadate.findOneAndRemove(
-        { _id: req.params.id }
-    ).then(result => {
-        response.success = true;
-        response.message = 'datadate has been deleted';
-        response.data._id = req.params.id;
-        res.status(201).json(response);
-    }).catch(err => {
-        response.message = 'datadate not deleted';
-        console.log(err)
-    })
+    Datadate.findByIdAndDelete(req.params.id).exec().then(before => {
+        if (before) {
+            response.success = true;
+            response.message = 'data have been deleted';
+            response.data._id = req.params.id;
+            response.data.letter = before.letter;
+            response.data.frequency = before.frequency;
+            res.status(201).json(response);
+        } else {
+            response.message = 'deleted failed, no data found';
+            res.status(500).json(response);
+        };
+    });
 });
 
+// browse
 router.get('/:id', (req, res, next) => {
-    let id = req.params.id;
     let response = {
         success: false,
         message: '',
         data: {}
     }
-    Datadate.findById(id).then(result => {
+    Datadate.findById(req.params.id).exec().then(result => {
         response.success = true;
-        response.message = 'Datadate found';
-        response.data._id = id;
+        response.message = 'data found';
+        response.data._id = req.params.id;
         response.data.letter = result.letter;
         response.data.frequency = result.frequency;
-        res.status(201).json(response);
+        res.status(200).json(response);
     }).catch(err => {
-        response.message = 'Datadate not found';
-        console.log(err)
-    })
+        response.message = 'data not found';
+        res.status(500).json(err);
+    });
 });
 
 module.exports = router;

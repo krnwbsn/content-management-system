@@ -12,8 +12,8 @@ describe('data', function () {
 
     beforeEach(function (done) {
         let data = new Data({
-            letter: "A",
-            frequency: "1.1"
+            letter: 'A',
+            frequency: '1.1'
         });
 
         data.save(function (err) {
@@ -32,46 +32,6 @@ describe('data', function () {
             .post('/api/data/search')
             .send({
                 'letter': 'A',
-                'frequency': 1.1
-            })
-            .end(function (err, res) {
-                res.should.have.status(200);
-                res.should.be.json;
-                res.body.should.be.a('array');
-                res.body[0].should.have.property('_id');
-                res.body[0].should.have.property('letter');
-                res.body[0].should.have.property('frequency');
-                res.body[0].letter.should.equal('A');
-                res.body[0].frequency.should.equal(1.1);
-                done();
-            });
-    });
-
-    // search
-    it('seharusnya mendapatkan daftar data yang ada di table data jika search letter dengan metode POST', function (done) {
-        chai.request(server)
-            .post('/api/data/search')
-            .send({
-                'letter': 'A'
-            })
-            .end(function (err, res) {
-                res.should.have.status(200);
-                res.should.be.json;
-                res.body.should.be.a('array');
-                res.body[0].should.have.property('_id');
-                res.body[0].should.have.property('letter');
-                res.body[0].should.have.property('frequency');
-                res.body[0].letter.should.equal('A');
-                res.body[0].frequency.should.equal(1.1);
-                done();
-            });
-    });
-
-    // search
-    it('seharusnya mendapatkan daftar data yang ada di table data jika search frequency dengan metode POST', function (done) {
-        chai.request(server)
-            .post('/api/data/search')
-            .send({
                 'frequency': 1.1
             })
             .end(function (err, res) {

@@ -3,12 +3,12 @@ var router = express.Router();
 const Data = require('../models/data');
 
 // search
-router.post('/search', (req, res, next) => {
-    let { letter, frequency } = req.body;
+router.post('/search', function (req, res) {
+    const { letter, frequency } = req.body;
     let response = {
         message: ''
     };
-    if (letter != undefined || frequency.toString() != 'NaN') {
+    if (letter != undefined || frequency != 'NaN') {
         let filterData = {};
         letter ? filterData.letter = { $regex: letter, $options: 'i' } : undefined;
         frequency ? filterData.frequency = Number(frequency) : undefined;
@@ -121,7 +121,7 @@ router.delete('/:id', (req, res, next) => {
         } else {
             response.message = 'deleted failed, no data found';
             res.status(500).json(response);
-        }
+        };
     });
 });
 
@@ -141,7 +141,7 @@ router.get('/:id', (req, res, next) => {
         res.status(200).json(response);
     }).catch(err => {
         response.message = 'data not found';
-        res.status(500).json(err)
+        res.status(500).json(err);
     });
 });
 

@@ -5,6 +5,7 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
 
+// register
 router.post('/register', (req, res, next) => {
   const { email, password, retypepassword } = req.body;
   let response = {
@@ -92,6 +93,7 @@ router.post('/login', (req, res, next) => {
   })
 });
 
+// get list
 router.get('/list', (req, res, next) => {
   User.find().then(response => {
     res.status(200).json(response);
