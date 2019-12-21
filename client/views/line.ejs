@@ -6,7 +6,7 @@
             <div class="card-header">
                 <div>
                     <h5>
-                        Bar Chart
+                        Line Chart
                     </h5>
                 </div>
             </div>
@@ -19,40 +19,41 @@
 <% include partials/script %>
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 <script type="text/javascript">
-    const googleChart = (bardata) => {
-        google.charts.load('current', { 'packages': ['bar'] });
-        google.charts.setOnLoadCallback(drawChart);
+    const googleChart = (linedata) => {
+        google.charts.load('current', { 'packages': ['corechart'] });
+        google.charts.setOnLoadCallback(drawLogScales);
 
-        function drawChart() {
-            var data = google.visualization.arrayToDataTable([
-                ['Letter', 'Frequency'],
-                ...bardata
-            ]);
+        function drawLogScales() {
+            var data = new google.visualization.DataTable();
+                data.addColumn('string', 'Date');
+                data.addColumn('number', 'Frequency');
+                data.addRows(linedata);
 
             var options = {
-                width: 1000,
-                legend: { position: 'none' },
-                axes: {
-                    x: { 0: { side: 'bottom', label: 'Letter' } },
-                    y: { 0: { side: 'left', label: 'Frequency' } }
+                hAxis: {
+                    title: 'Date'
                 },
-                bar: { groupWidth: '90%' }
+                vAxis: {
+                    title: 'Frequency',
+                },
+                height: 400,
+                width: 610
             };
 
-            var chart = new google.charts.Bar(document.getElementById('chart'));
+            var chart = new google.visualization.LineChart(document.getElementById('chart'));
 
-            chart.draw(data, google.charts.Bar.convertOptions(options));
+            chart.draw(data, options);
         }
     };
 
-    const urldata = 'http://localhost:3000/api/data/bar';
+    const urldata = 'http://localhost:3000/api/datadate';
     const getDataDate = () => {
         $.ajax({
             url: urldata,
             method: 'GET'
         }).done(datadate => {
             let arr = datadate.map(value => {
-                return [value._id, value.total];
+                return [value.letter, value.frequency];
             });
             googleChart(arr);
         });
