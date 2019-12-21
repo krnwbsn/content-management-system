@@ -1,0 +1,56 @@
+<% include partials/header %>
+<% include partials/navbar %>
+<div class="container">
+    <main role="main">
+        <div class="card">
+            <div class="card-header">
+                <div>
+                    <h5>
+                        Map
+                    </h5>
+                </div>
+            </div>
+            <div class="card-body" align="center">
+                <div id="chart"></div>
+            </div>
+        </div>
+    </main>
+</div>
+<% include partials/script %>
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script type="text/javascript">
+    const googleChart = (mapdata) => {
+        google.charts.load('current', { 'packages': ['map'], 'mapsApiKey': 'AIzaSyD0dLakTJty9_jKj2g81Okzv4KsRE6189s' });
+        google.charts.setOnLoadCallback(drawMap);
+
+        function drawMap() {
+            var data = google.visualization.arrayToDataTable([
+                ['Lat', 'Long', 'Name'],
+                ...mapdata
+            ]);
+            var map = new google.visualization.Map(document.getElementById('chart'));
+            map.draw(data, {
+                showTooltip: true,
+                showInfoWindow: true
+            });
+        }
+    }
+    const urldata = 'http://localhost:3000/api/maps';
+    const getMap = () => {
+        $.ajax({
+            url: urldata,
+            method: 'GET'
+        }).done(data => {
+            let arr = data.map(value => {
+                return [value.lat, value.lng, value.title];
+            });
+            googleChart(arr);
+        });
+    };
+
+    $(() => {
+        getMap();
+    });
+</script>
+<!-- AIzaSyD0dLakTJty9_jKj2g81Okzv4KsRE6189s -->
+<% include partials/footer %>
