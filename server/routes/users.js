@@ -14,7 +14,7 @@ router.post('/register', (req, res, next) => {
     data: {},
     token: ''
   }
-  if (password == retypepassword) {
+  if (password === retypepassword) {
     User.findOne({ email }).then(result => {
       if (result) {
         response.message = 'Try another email';

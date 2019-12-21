@@ -34,6 +34,9 @@ router.get('/map', function (req, res) {
   res.render('map');
 });
 
+router.get('/maps', function (req, res) {
+  res.render('maps');
+});
 
 router.get('/login', function (req, res) {
   res.render('login');

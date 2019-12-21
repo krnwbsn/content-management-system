@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 const Map = require('../models/map');
+const defaultResponse = require('../helper/response');
 
 // search
 router.post('/search', (req, res) => {
@@ -30,12 +31,8 @@ router.get('/', (req, res, next) => {
 // add
 router.post('/', (req, res, next) => {
     const { title, lat, lng } = req.body;
-    let response = {
-        success: false,
-        message: '',
-        data: { _id: '', title: '', lat: null, lng: null }
-    }
-    if (title != undefined || lat != undefined || lng != undefined) {
+    let response = { ...defaultResponse, data: { _id: '', title: '', lat: null, lng: null } }
+    if (![title, lat, lng].includes(undefined)) {
         const map = new Map({
             title,
             lat,
@@ -62,16 +59,13 @@ router.post('/', (req, res, next) => {
 // edit
 router.put('/:id', (req, res, next) => {
     const { title, lat, lng } = req.body;
-    let response = {
-        success: false,
-        message: '',
-        data: {}
-    }
-    if (title != undefined || lat != undefined || lng != undefined) {
-        let editData = {};
-        title ? editData.title = title : '';
-        lat ? editData.lat = lat : '';
-        lng ? editData.lng = lng : '';
+    let response = { ...defaultResponse };
+    if (![title, lat, lng].includes(undefined)) {
+        const editData = {
+            title: title || '',
+            lng: lng || '',
+            lat: lat || '',
+        };
 
         Map.findByIdAndUpdate(req.params.id, editData).exec().then(before => {
             response.success = true;
@@ -90,11 +84,7 @@ router.put('/:id', (req, res, next) => {
 
 // delete
 router.delete('/:id', (req, res, next) => {
-    let response = {
-        success: false,
-        message: '',
-        data: {}
-    }
+    let response = { ...defaultResponse }
     Map.findByIdAndDelete(req.params.id).exec().then(before => {
         if (before) {
             response.success = true;
@@ -113,11 +103,7 @@ router.delete('/:id', (req, res, next) => {
 
 // browse
 router.get('/:id', (req, res, next) => {
-    let response = {
-        success: false,
-        message: '',
-        data: {}
-    }
+    let response = { ...defaultResponse }
     Map.findById(req.params.id).then(result => {
         response.success = true;
         response.message = 'Data found';
