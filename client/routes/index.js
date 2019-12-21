@@ -7,7 +7,7 @@ router.get('/', function (req, res) {
 });
 
 router.get('/home', function (req, res) {
-  res.render('index');
+  res.render('home');
 });
 
 router.get('/data', function (req, res) {
@@ -28,10 +28,6 @@ router.get('/bar', function (req, res) {
 
 router.get('/pie', function (req, res) {
   res.render('pie');
-});
-
-router.get('/maps', function (req, res) {
-  res.render('maps');
 });
 
 router.get('/map', function (req, res) {
