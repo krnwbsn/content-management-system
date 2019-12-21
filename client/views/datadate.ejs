@@ -1,16 +1,105 @@
-<% include ./partials/header %>
-<% include ./partials/navbar %>
-<div class="jumbotron jumbotron-fluid">
-    <div class="container">
-        <h1 class="display-4" id="welcomeMessage"></h1>
-    </div>
+<% include partials/header %>
+<% include partials/navbar %>
+<div class="container">
+    <a href=""><button type="button" class="btn btn-outline-success mt-1 mb-5"><i class="fa fa-plus"></i>
+            Add</button></a>
+    <form class="mb-5" id="form-add">
+        <div class="form-group row">
+            <label for="addLetter" class="col-sm-1 col-form-label">Letter</label>
+            <div class="col-sm-3">
+                <input type="text" class="form-control" id="letter" placeholder="Letter">
+            </div>
+            <label for="addFrequency" class="col-sm-1 col-form-label">Frequency</label>
+            <div class="col-sm-3">
+                <input type="text" class="form-control" id="frequency" placeholder="Frequency">
+            </div>
+            <div class="col-2">
+                <button type="submit" class="btn btn-primary text-white p-2 mt-6" href=""><i class="fa fa-save"></i>
+                    Save</button>
+            </div>
+        </div>
+    </form>
+    <h5>Search</h5>
+    <hr />
+    <form>
+        <div class="form-group row">
+            <label for="searchLetter" class="col-sm-1 col-form-label">Letter</label>
+            <div class="col-sm-3">
+                <input type="text" class="form-control" id="searchLetter" placeholder="Letter">
+            </div>
+            <label for="searchFrequency" class="col-sm-1 col-form-label">Frequency</label>
+            <div class="col-sm-3">
+                <input type="text" class="form-control" id="searchFrequency" placeholder="Frequency">
+            </div>
+        </div>
+        <br>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Letter</th>
+                    <th scope="col">Frequency</th>
+                    <th scope="col">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </form>
 </div>
-<% include ./partials/script %>
-<script src="/javascripts/navbar.js" type="text/javascript"></script>
-<script>
-    $(() => {
-        $('#welcomeMessage').text(`Welcome, ` + localStorage.getItem('email'));
-        $('#homeMenu').addClass('active');
-    })  
+<% include partials/script %>
+<script type="text/javascript">
+    const apiUrl = 'http://localhost:3000/api/data';
+    $(document).ready(() => {
+        loadData();
+    })
+
+    $('#form-add').submit((e) => {
+        e.preventDefault();
+        addData();
+    })
+
+    const loadData = () => {
+        $.ajax({
+            url: apiUrl,
+            method: 'GET',
+            dataType: 'json'
+        }).done((data) => {
+            let html = '';
+            data.forEach((item, index) => {
+                html += `<tr>
+                <td scope="row">${index + 1}</td>
+                <td>${item.letter}</td>
+                <td>${item.frequency}</td>
+                <td><a class="btn btn-success" href="">Edit</a> <a class="btn btn-danger" href="">Delete</a></td>
+                </tr>`
+            });
+            $('table tbody').html(html);
+        }).fail((jqXHR, textStatus) => {
+            alert('Request failed: ' + textStatus);
+        });
+    }
+
+    const addData = () => {
+        let letter = $('#letter').val();
+        let frequency = $('#frequency').val();
+        $.ajax({
+            url: apiUrl,
+            method: 'POST',
+            data: { letter, frequency },
+            dataType: 'json'
+        }).done(function (data) {
+            loadData();
+        }).fail(function (jqXHR, textStatus) {
+            alert("Request failed: " + textStatus);
+        });
+        $('#letter').val('');
+        $('#frequency').val('');
+    }
+
+    const deleteData = () => {
+
+    }
+
 </script>
-<% include ./partials/footer %>
+<% include partials/footer %>
