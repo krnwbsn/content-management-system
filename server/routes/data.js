@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 const Data = require('../models/data');
+const defaultResponse = require('../helper/response');
 
 // search
 router.post('/search', function (req, res) {
@@ -48,12 +49,8 @@ router.get('/bar', function (req, res) {
 // add
 router.post('/', (req, res, next) => {
     const { letter, frequency } = req.body;
-    let response = {
-        success: false,
-        message: '',
-        data: { _id: '', letter: '', frequency: null }
-    };
-    if (letter != undefined || frequency != undefined) {
+    let response = { ...defaultResponse, data: { _id: '', title: '', lat: null, lng: null } }
+    if (![letter, frequency].includes(undefined)) {
         const data = new Data({
             letter,
             frequency
@@ -79,15 +76,12 @@ router.post('/', (req, res, next) => {
 // edit
 router.put('/:id', (req, res, next) => {
     const { letter, frequency } = req.body;
-    let response = {
-        success: false,
-        message: '',
-        data: {}
-    };
-    if (letter != undefined || frequency != undefined) {
-        let editData = {};
-        letter ? editData.letter = letter : '';
-        frequency ? editData.frequency = frequency : '';
+    let response = { ...defaultResponse }
+    if (![letter, frequency].includes(undefined)) {
+        const editData = {
+            letter: letter || '',
+            frequency: frequency || ''
+        };
 
         Data.findByIdAndUpdate(req.params.id, editData).exec().then(before => {
             response.success = true;
@@ -105,11 +99,7 @@ router.put('/:id', (req, res, next) => {
 
 // delete
 router.delete('/:id', (req, res, next) => {
-    let response = {
-        success: false,
-        message: '',
-        data: {}
-    }
+    let response = { ...defaultResponse }
     Data.findByIdAndDelete(req.params.id).exec().then(before => {
         if (before) {
             response.success = true;
@@ -127,11 +117,7 @@ router.delete('/:id', (req, res, next) => {
 
 // browse
 router.get('/:id', (req, res, next) => {
-    let response = {
-        success: false,
-        message: '',
-        data: {}
-    }
+    let response = { ...defaultResponse }
     Data.findById(req.params.id).exec().then(result => {
         response.success = true;
         response.message = 'data found';

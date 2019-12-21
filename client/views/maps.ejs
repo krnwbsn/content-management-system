@@ -5,13 +5,17 @@
             Add</button></a>
     <form class="mb-2" id="form-add">
         <div class="form-group row">
-            <label for="addLetter" class="col-sm-1 col-form-label">Letter</label>
-            <div class="col-sm-3">
-                <input type="date" class="form-control" id="letter" placeholder="Letter">
+            <label for="addLetter" class="col-sm-1 col-form-label">Title</label>
+            <div class="col-sm-2">
+                <input type="text" class="form-control" id="title" placeholder="Title of Map">
             </div>
-            <label for="addFrequency" class="col-sm-1 col-form-label">Frequency</label>
-            <div class="col-sm-3">
-                <input type="text" class="form-control" id="frequency" placeholder="Frequency">
+            <label for="addFrequency" class="col-sm-1 col-form-label">Latitude</label>
+            <div class="col-sm-2">
+                <input type="text" class="form-control" id="lat" placeholder="0.0000">
+            </div>
+            <label for="addFrequency" class="col-sm-1 col-form-label">Longitude</label>
+            <div class="col-sm-2">
+                <input type="text" class="form-control" id="lng" placeholder="0.0000">
             </div>
             <div class="col-2">
                 <button type="submit" class="btn btn-primary text-white" href=""><i class="fa fa-save"></i>
@@ -23,13 +27,9 @@
     <hr />
     <form>
         <div class="form-group row">
-            <label for="searchLetter" class="col-sm-1 col-form-label">Letter</label>
-            <div class="col-sm-3">
-                <input type="text" class="form-control" id="searchLetter" placeholder="Letter">
-            </div>
-            <label for="searchFrequency" class="col-sm-1 col-form-label">Frequency</label>
-            <div class="col-sm-3">
-                <input type="text" class="form-control" id="searchFrequency" placeholder="Frequency">
+            <label for="searchLetter" class="col-sm-1 col-form-label">Title</label>
+            <div class="col-sm-2">
+                <input type="text" class="form-control" id="searchTitle" placeholder="Title of Map">
             </div>
         </div>
         <br>
@@ -37,8 +37,9 @@
             <thead>
                 <tr>
                     <th scope="col">#</th>
-                    <th scope="col">Letter</th>
-                    <th scope="col">Frequency</th>
+                    <th scope="col">Title</th>
+                    <th scope="col">Latitude</th>
+                    <th scope="col">Longitude</th>
                     <th scope="col">Actions</th>
                 </tr>
             </thead>
@@ -49,7 +50,7 @@
 </div>
 <% include partials/script %>
 <script type="text/javascript">
-    const apiUrl = 'http://localhost:3000/api/datadate';
+    const apiUrl = 'http://localhost:3000/api/maps';
     $(document).ready(() => {
         loadData();
     })
@@ -69,8 +70,9 @@
             data.forEach((item, index) => {
                 html += `<tr>
                 <td scope="row">${index + 1}</td>
-                <td>${item.letter}</td>
-                <td>${item.frequency}</td>
+                <td>${item.title}</td>
+                <td>${item.lat}</td>
+                <td>${item.lng}</td>
                 <td><a class="btn btn-success" href="">Edit</a> <a class="btn btn-danger" href="">Delete</a></td>
                 </tr>`
             });
@@ -81,12 +83,13 @@
     }
 
     const addData = () => {
-        let letter = $('#letter').val();
-        let frequency = $('#frequency').val();
+        let title = $('#title').val();
+        let lat = $('#lat').val();
+        let lng = $('#lng').val();
         $.ajax({
             url: apiUrl,
             method: 'POST',
-            data: { letter, frequency },
+            data: { title, lat, lng },
             dataType: 'json'
         }).done(function (data) {
             loadData();
