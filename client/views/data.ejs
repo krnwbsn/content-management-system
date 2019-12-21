@@ -1,0 +1,38 @@
+<% include partials/header %>
+<br>
+<a href=""><button type="button" class="btn btn-outline-success"><i class="fa fa-plus"></i>
+        Add</button></a>
+
+<br>
+<h4><span class="border-bottom">Search</span></h4>
+<br>
+<form>
+    <div class="form-row">
+        <label for="inputLetter" class="col-sm-1 col-form-label">Letter</label>
+        <div class="col-sm-2">
+            <input type="" class="form-control" id="inputLetter" placeholder="A">
+        </div>
+        <label for="inputFrequency" class="col-sm-1 col-form-label">Frequency</label>
+        <div class="col-sm-2">
+            <input type="" class="form-control" id="inputFrequency" placeholder="0.0000">
+        </div>
+    </div>
+    <br>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Letter</th>
+                <th scope="col">Frequency</th>
+                <th scope="col">Actions</th>
+
+            </tr>
+        </thead>
+    </table>
+    <a href="/editdata"><button type="button" class="btn btn-outline-success"><i class="fas fa-edit"></i>
+            Edit</button></a>
+    <a href=""><button type="button" class="btn btn-outline-danger"><i class="fas fa-trash"></i>
+            Delete</button></a>
+</form>
+<% include partials/script %>
+<% include partials/footer %>
