@@ -1,0 +1,69 @@
+<% include partials/header %>
+<% include partials/navbar %>
+<body>
+    <div class="container d-flex w-100 h-100 p-3 mx-auto flex-column">
+        <header class="masthead mb-auto text-rig">
+        </header>
+
+        <main role="main" class="inner cover dashboard-main">
+            <div class="card">
+                <div class="card-header">
+                    <div class="row justify-content-between">
+                        <h5 class="text-left col align-bottom" style="color: black">
+                            <i class="fas fa-bookmark" style="color: grey !important"></i> Maps
+                        </h5>
+                        <h5 class="text-right col" style="color: black">
+                            <a role="button" class="btn btn-success" href="/"><i class="fas fa-home"
+                                    style="color: white !important"></i></a>
+                            <a role="button" class="btn btn-info" href="/maps"><i class="fas fa-table"
+                                    style="color: white !important"></i></a>
+                        </h5>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div id="chart_div"></div>
+                </div>
+            </div>
+        </main>
+
+        <footer class="mastfoot mt-auto">
+        </footer>
+    </div>
+    <%# include ./partials/script %>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+        const googleChart = (mapdata) => {
+            google.charts.load("current", {
+                "packages": ["map"],
+                "mapsApiKey": "AIzaSyDvp5CKHX1e1_TP_JizSu5gW4oS4rb1Yy0"
+            });
+            google.charts.setOnLoadCallback(drawChart);
+            function drawChart() {
+                var data = google.visualization.arrayToDataTable([
+                    ['Lat', 'Long', 'Name'],
+                    ...mapdata
+                ]);
+                var map = new google.visualization.Map(document.getElementById('chart_div'));
+                map.draw(data, {
+                    showTooltip: true,
+                    showInfoWindow: true
+                });
+            }
+        }
+        const urldata = 'http://localhost:3000/api/maps/';
+        const getMap = () => {
+            $.ajax({
+                url: urldata,
+                method: 'GET'
+            }).done(datadate => {
+                let arrDate = datadate.map(value => {
+                    return [value.lat, value.lng, value.title];
+                });
+                googleChart(arrDate);
+            })
+        }
+        $(() => {
+            getMap();
+        })
+    </script>
+    <%# include ./partials/footer %>
