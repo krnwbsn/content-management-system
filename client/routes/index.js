@@ -30,12 +30,18 @@ router.get('/pie', function (req, res) {
   res.render('pie');
 });
 
-router.get('/maps', function (req, res) {
-  res.render('maps');
-});
-
 router.get('/map', function (req, res) {
   res.render('map');
 });
+
+
+router.get('/login', function (req, res) {
+  res.render('login');
+});
+
+router.get('/register', function (req, res) {
+  res.render('register');
+});
+
 
 module.exports = router;
