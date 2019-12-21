@@ -1,38 +1,100 @@
 <% include partials/header %>
-<br>
-<a href=""><button type="button" class="btn btn-outline-success"><i class="fa fa-plus"></i>
-        Add</button></a>
-
-<br>
-<h4><span class="border-bottom">Search</span></h4>
-<br>
-<form>
-    <div class="form-row">
-        <label for="inputLetter" class="col-sm-1 col-form-label">Letter</label>
-        <div class="col-sm-2">
-            <input type="" class="form-control" id="inputLetter" placeholder="A">
+<% include partials/navbar %>
+<div class="container">
+    <a href=""><button type="button" class="btn btn-outline-success mt-5 mb-5"><i class="fa fa-plus"></i>
+            Add</button></a>
+    <form class="mb-5" id="form-add">
+        <div class="form-group row">
+            <label for="addLetter" class="col-sm-1 col-form-label">Letter</label>
+            <div class="col-sm-3">
+                <input type="text" class="form-control" id="letter" placeholder="Letter">
+            </div>
+            <label for="addFrequency" class="col-sm-1 col-form-label">Frequency</label>
+            <div class="col-sm-3">
+                <input type="text" class="form-control" id="frequency" placeholder="Frequency">
+            </div>
+            <div class="col-2">
+                <button type="submit" class="btn btn-primary text-white p-2 mt-6" href=""><i class="fa fa-save"></i> Save</button>
+            </div>
         </div>
-        <label for="inputFrequency" class="col-sm-1 col-form-label">Frequency</label>
-        <div class="col-sm-2">
-            <input type="" class="form-control" id="inputFrequency" placeholder="0.0000">
+    </form>
+    <h5>Search</h5>
+    <hr />
+    <form>
+        <div class="form-group row">
+            <label for="searchLetter" class="col-sm-1 col-form-label">Letter</label>
+            <div class="col-sm-3">
+                <input type="text" class="form-control" id="searchLetter" placeholder="Letter">
+            </div>
+            <label for="searchFrequency" class="col-sm-1 col-form-label">Frequency</label>
+            <div class="col-sm-3">
+                <input type="text" class="form-control" id="searchFrequency" placeholder="Frequency">
+            </div>
         </div>
-    </div>
-    <br>
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th scope="col">#</th>
-                <th scope="col">Letter</th>
-                <th scope="col">Frequency</th>
-                <th scope="col">Actions</th>
-
-            </tr>
-        </thead>
-    </table>
-    <a href="/editdata"><button type="button" class="btn btn-outline-success"><i class="fas fa-edit"></i>
-            Edit</button></a>
-    <a href=""><button type="button" class="btn btn-outline-danger"><i class="fas fa-trash"></i>
-            Delete</button></a>
-</form>
+        <br>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Letter</th>
+                    <th scope="col">Frequency</th>
+                    <th scope="col">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </form>
+</div>
 <% include partials/script %>
+<script type="text/javascript">
+    const apiUrl = 'http://localhost:3000/api/data';
+    $(document).ready(() => {
+        loadData();
+    })
+
+    $('#form-add').submit((e) => {
+        e.preventDefault();
+        addData();
+    })
+
+    const loadData = () => {
+        $.ajax({
+            url: apiUrl,
+            method: 'GET',
+            dataType: 'json'
+        }).done((data) => {
+            let html = '';
+            data.forEach((item, index) => {
+                html += `<tr>
+                <td scope="row">${index + 1}</td>
+                <td>${item.letter}</td>
+                <td>${item.frequency}</td>
+                <td><a class="btn btn-success" href="">Edit</a> <a class="btn btn-danger" href="">Delete</a></td>
+                </tr>`
+            });
+            $('table tbody').html(html);
+        }).fail((jqXHR, textStatus) => {
+            alert('Request failed: ' + textStatus);
+        });
+    }
+
+    const addData = () => {
+        let letter = $('#letter').val();
+        let frequency = $('#frequency').val();
+        $.ajax({
+            url: apiUrl,
+            method: 'POST',
+            data: { letter, frequency },
+            dataType: 'json'
+        }).done(function (data) {
+            loadData();
+        }).fail(function (jqXHR, textStatus) {
+            alert("Request failed: " + textStatus);
+        });
+        $('#letter').val('');
+        $('#frequency').val('');
+    }
+
+</script>
 <% include partials/footer %>
