@@ -4,9 +4,37 @@ const User = require('../models/user');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
+// PASPORT FACEBOOK
+var passport = require('passport')
+  , FacebookStrategy = require('passport-facebook').Strategy;
+
+  passport.use(new FacebookStrategy({
+    clientID: "2218927491734615",
+    clientSecret: "f8d4fece645b10b786aca627cd985efa",
+    callbackURL: "/callback"
+  },
+  function(accessToken, refreshToken, profile, done) {
+    User.findOrCreate(function(err, user) {
+      if (err) { return done(err); }
+      done(null, user);
+    });
+  }
+));
+
+
+router.get('/fb', passport.authenticate('facebook'));
+router.get('/callback', passport.authenticate('facebook', { successRedirect: '/sukses', failureRedirect: '/login' }));
+
+// router.get('/sukses', require('connect-ensure-login').ensureLoggedIn(), function(){
+// })
+//\ PASPORT FACEBOOK
+
+
 
 // register
 router.post('/register', (req, res, next) => {
+  console.log(req.body);
+  
   const { email, password, retypepassword } = req.body;
   let response = {
     status: false,
