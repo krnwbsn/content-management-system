@@ -12,7 +12,7 @@ var passport = require('passport')
   passport.use(new FacebookStrategy({
     clientID: "2218927491734615",
     clientSecret: "f8d4fece645b10b786aca627cd985efa",
-    callbackURL: "/callback"
+    callbackURL: "api/users/fb/callback"
   },
   function(accessToken, refreshToken, profile, done) {
     User.findOrCreate(function(err, user) {
@@ -24,12 +24,12 @@ var passport = require('passport')
 
 
 router.get('/fb', passport.authenticate('facebook'));
-router.get('/callback', passport.authenticate('facebook', { successRedirect: '/sukses', failureRedirect: '/login' }));
+router.get('/fb/callback', passport.authenticate('facebook', { successRedirect: '/sukses', failureRedirect: '/login' }));
 
 // router.get('/sukses', require('connect-ensure-login').ensureLoggedIn(), function(){
+// res.redirect('http://localhost:3004/home')
 // })
 //\ PASPORT FACEBOOK
-
 
 
 // register
