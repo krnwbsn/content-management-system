@@ -4,6 +4,7 @@ const User = require('../models/user');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
+
 // PASPORT FACEBOOK
 var passport = require('passport')
   , FacebookStrategy = require('passport-facebook').Strategy;
@@ -64,6 +65,8 @@ router.post('/register', (req, res, next) => {
               response.data.password = password;
               response.token = token;
               res.json(response);
+              // res.redirect("http://localhost:3004/login")
+              // NANTI PAKAI FLASH
             }).catch(err => {
               response.message = 'Email or Password is not valid';
               res.status(500).json(err);
@@ -106,7 +109,8 @@ router.post('/login', (req, res, next) => {
               response.message = 'Error!';
               res.status(401).json(response);
             } else {
-              res.status(200).json(response);
+              // res.status(200).json(response);
+              res.redirect("http://localhost:3004/home")
             }
           })) 
         } else {
