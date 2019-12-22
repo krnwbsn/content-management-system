@@ -1,24 +1,38 @@
 <% include partials/header %>
 <% include partials/navbar %>
 <div class="container">
-    <a href=""><button type="button" class="btn btn-outline-success mt-2 mb-2"><i class="fa fa-plus"></i>
+    <a href=""><button type="button" class="btn btn-outline-success mt-2 mb-2" id="btn-add"><i class="fa fa-plus"></i>
             Add</button></a>
-    <form class="mb-2" id="form-add">
-        <div class="form-group row">
-            <label for="addLetter" class="col-sm-1 col-form-label">Letter</label>
-            <div class="col-sm-3">
-                <input type="text" class="form-control" id="letter" placeholder="Letter">
+    <div class="alert alert-primary" role="alert" style="display: none" id="add">
+        data have been added
+    </div>
+
+    <div class="alert alert-primary" role="alert" style="display: none" id="edit">
+        data have been update
+    </div>
+
+    <div class="alert alert-danger" role="alert" style="display: none" id="del">
+        data have been deleted
+    </div>
+    <div id="div-add" style="display:none">
+        <form class="mb-2" id="form-add">
+            <input type="hidden" id="id" />
+            <div class="form-group row">
+                <label for="addLetter" class="col-sm-1 col-form-label">Letter</label>
+                <div class="col-sm-3">
+                    <input type="text" class="form-control" id="letter" placeholder="Letter">
+                </div>
+                <label for="addFrequency" class="col-sm-1 col-form-label">Frequency</label>
+                <div class="col-sm-3">
+                    <input type="text" class="form-control" id="frequency" placeholder="Frequency">
+                </div>
+                <div class="col-2">
+                    <button type="submit" class="btn btn-primary text-white" href=""><i class="fa fa-save"></i>
+                        Save</button>
+                </div>
             </div>
-            <label for="addFrequency" class="col-sm-1 col-form-label">Frequency</label>
-            <div class="col-sm-3">
-                <input type="text" class="form-control" id="frequency" placeholder="Frequency">
-            </div>
-            <div class="col-2">
-                <button type="submit" class="btn btn-primary text-white" href=""><i class="fa fa-save"></i>
-                    Save</button>
-            </div>
-        </div>
-    </form>
+        </form>
+    </div>
     <h5>Search</h5>
     <hr />
     <form>
@@ -49,15 +63,26 @@
 </div>
 <% include partials/script %>
 <script type="text/javascript">
-    const apiUrl = 'http://localhost:3000/api/data/';
-    $(document).ready(() => {
-        loadData();
-    })
+    const apiUrl = 'http://localhost:3000/api/data';
+    $('#btn-add').click(() => {
+        $('#div-add').toggle();
+    });
 
-    $('#form-add').submit((e) => {
-        e.preventDefault();
-        addData();
-    })
+    $(document).ready(function () {
+        loadData();
+        $('#form-add').submit((e) => {
+            e.preventDefault();
+            if ($('#id').val() == '') {
+                addData();
+                $('#div-add').hide();
+            } else {
+                editData();
+                $('#div-add').hide();
+                $('#edit').show()
+            }
+            $('#id').val('')
+        });
+    });
 
     const loadData = () => {
         $.ajax({
@@ -71,40 +96,129 @@
                 <td scope="row">${index + 1}</td>
                 <td>${item.letter}</td>
                 <td>${item.frequency}</td>
-                <td><a class="btn btn-success" href="">Edit</a> <a role="button" class="btn btn-danger" data-id="${data._id}" href="">Delete</a></td>
+                <td><a role="button" class="btn btn-success btn-edit" data-id="${JSON.stringify(item)}" href="">Edit</a> 
+                    <a role="button" class="btn btn-danger btn-delete" data-id="${item._id}" href="">Delete</a></td>
                 </tr>`
             });
             $('table tbody').html(html);
         }).fail((jqXHR, textStatus) => {
             alert('Request failed: ' + textStatus);
         });
-    }
+    };
+
+    const searchData = () => {
+        let letter = $('#searchLetter').val();
+        let frequency = $('#searchFrequency').val();
+        if (letter || frequency) {
+            $.ajax({
+                url: `${apiUrl}/search`,
+                method: 'POST',
+                data: {
+                    letter,
+                    frequency
+                },
+                success: (result) => {
+                    loadData(result);
+                }
+            })
+        }
+    };
+
+    $('#searchFrequency').keyup(() => {
+        searchData();
+    });
+
+    $('#searchLetter').keyup(() => {
+        $('#searchLetter').val($('#searchLetter').val().toUpperCase());
+        searchData();
+    });
+
+    const showData = () => {
+        $.ajax({
+            url: apiUrl,
+            method: 'GET'
+        }).done(data => {
+            loadData(data)
+        })
+    };
+
+    const editData = () => {
+            let id = $('#id').val();
+            let letter = $('#letter').val();
+            let frequency = $('#frequency').val()
+            $.ajax({
+                url: `${apiUrl}/${id}`,
+                method: 'PUT',
+                data: {
+                    letter: letter,
+                    frequency: frequency
+                }
+            }).done(res => {
+                showData()
+            })
+        }
+        $('table tbody').on('click', '.btn-delete', (el) => {
+            deleteData(el.currentTarget.attributes['data-id'].nodeValue);
+        });
 
     const addData = () => {
-        let letter = $('#letter').val();
+        let letter = $('#letter').val().toUpperCase();
         let frequency = $('#frequency').val();
         $.ajax({
             url: apiUrl,
             method: 'POST',
-            data: { letter, frequency },
-            dataType: 'json'
-        }).done(function (data) {
-            loadData();
-        }).fail(function (jqXHR, textStatus) {
-            alert("Request failed: " + textStatus);
-        });
-        $('#letter').val('');
-        $('#frequency').val('');
-    }
-
-    const deleteData = (id) => {
-        $.ajax({
-            url: apiUrl + `${id}`,
-            method: 'DELETE'
-        }).done(response => {
+            data: {
+                letter: letter,
+                frequency: frequency
+            },
+            success: function (message) {
+                $('#add').show()
+            }
+        }).done(respon => {
             loadData();
         })
-    }
+    };
+
+    $('table tbody').on('click', '.btn-delete', (el) => {
+            deleteData(el.currentTarget.attributes['data-id'].nodeValue);
+        });
+        const deleteData = (id) => {
+            let letter = $('#letter').val();
+            let frequency = $('#frequency').val();
+            $.ajax({
+                url: `${apiUrl}/${id}`,
+                method: 'DELETE',
+                success: function () {
+                    $('#del').show()
+                }
+            }).done(respon => {
+                loadData();
+                alert('Are you sure?')
+            })
+        };
+
+    $('table tbody').on('click', '.btn-edit', (el) => {
+            let item = JSON.parse(el.currentTarget.attributes['data-id'].nodeValue);
+            $('#letter').val(item.letter);
+            $('#frequency').val(item.frequency);
+            $('#id').val(item._id);
+            $('#div-add').show();
+            editData()
+        });
+
+        // function auth() {
+        //         $.ajax({
+        //             url: `http://localhost:3000/api/users/check`,
+        //             method: "POST",
+        //             data: {
+        //                 token: localStorage.getItem('token')
+        //             }
+        //         }).done((data) => {
+        //             if (!data.valid) {
+        //                 window.location = '/login'
+        //             }
+        //         })
+        //     }
 
 </script>
 <% include partials/footer %>
