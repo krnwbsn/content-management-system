@@ -132,6 +132,14 @@
         });
     };
 
+    $('table tbody').on('click', '.btn-edit', (el) => {
+            let item = JSON.parse(el.currentTarget.attributes['data-id'].nodeValue);
+            $('#letter').val(item.letter);
+            $('#frequency').val(item.frequency);
+            $('#id').val(item._id);
+            $('#form-add').show();
+            editData()
+        });
     const editData = () => {
         let id = $('#id').val();
         let letter = $('#letter').val();
