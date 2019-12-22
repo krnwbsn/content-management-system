@@ -35,7 +35,6 @@ router.get('/callback', passport.authenticate('facebook', { successRedirect: '/s
 // register
 router.post('/register', (req, res, next) => {
   console.log(req.body);
-  
   const { email, password, retypepassword } = req.body;
   let response = {
     status: false,
@@ -65,7 +64,7 @@ router.post('/register', (req, res, next) => {
               response.data.password = password;
               response.token = token;
               res.json(response);
-              // res.redirect("http://localhost:3004/login")
+              res.redirect("http://localhost:3004/login")
               // NANTI PAKAI FLASH
             }).catch(err => {
               response.message = 'Email or Password is not valid';
