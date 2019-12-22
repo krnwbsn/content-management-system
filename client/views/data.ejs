@@ -1,20 +1,29 @@
 <% include partials/header %>
 <% include partials/navbar %>
 <div class="container">
-    <button type="button" class="btn btn-outline-success mt-2 mb-2" id="btn-add"><i class="fa fa-plus"></i> Add</button>
+    <div class="alert alert-primary mt-1" role="alert" style="display: none" id="add">
+        data have been added
+    </div>
+    <div class="alert alert-primary mt-1" role="alert" style="display: none" id="edit">
+        data have been update
+    </div>
+    <div class="alert alert-danger mt-1" role="alert" style="display: none" id="del">
+        data have been deleted
+    </div>
+    <button type="button" class="btn btn-outline-success mt-1 mb-1" id="btn-add"><i class="fa fa-plus"></i> Add</button>
     <form id="form-add" style="display:none">
+        <input type="hidden" id="id" value="">
         <div class="form-group row">
             <label for="addLetter" class="col-sm-1 col-form-label">Letter</label>
             <div class="col-sm-3">
-                <input type="text" class="form-control" id="letter" placeholder="Letter">
+                <input type="text" class="form-control" id="letter" placeholder="Letter" required autofocus>
             </div>
             <label for="addFrequency" class="col-sm-1 col-form-label">Frequency</label>
             <div class="col-sm-3">
-                <input type="text" class="form-control" id="frequency" placeholder="Frequency">
+                <input type="text" class="form-control" id="frequency" placeholder="Frequency" required autofocus>
             </div>
-            <div class="col-2">
-                <button type="submit" class="btn btn-primary text-white" href=""><i class="fa fa-save"></i> Save</button>
-                <button type="button" class="btn btn-outline-danger" id="btn-cancel"><i class="fa fa-refresh"></i> Cancel</button>
+            <div class="col-4">
+                <button type="submit" class="btn btn-primary text-white"><i class="fa fa-save"></i> Save</button>
             </div>
         </div>
     </form>
@@ -50,20 +59,25 @@
 <script type="text/javascript">
     const apiUrl = 'http://localhost:3000/api/data';
 
-    $(document).ready(() => {
-        $("#btn-add").click(() => {
-            $("#form-add").show();
-        });
-        $("#btn-cancel").click(() => {
-            $("#form-add").hide();
-        });
-        loadData();
-    });
-
-    $('#form-add').submit((e) => {
-        e.preventDefault();
-        addData();
+    $('#btn-add').click(() => {
+        $('#form-add').toggle();
     })
+
+    $(document).ready(function () {
+        loadData();
+        $('#form-add').submit((e) => {
+            e.preventDefault();
+            if ($('#id').val() == '') {
+                addData();
+                $('#form-add').hide();
+            } else {
+                editData();
+                $('#form-add').hide();
+                $('#edit').show()
+            }
+            $('#id').val('')
+        });
+    });
 
     const loadData = () => {
         $.ajax({
@@ -77,14 +91,14 @@
                 <td scope="row">${index + 1}</td>
                 <td>${item.letter}</td>
                 <td>${item.frequency}</td>
-                <td><button type="button" class="btn btn-outline-warning btn-edit" data-id='${item._id}'><i class="fa fa-pencil"></i> Edit</button> <button type="button" class="btn btn-danger btn-delete" data-id='${item._id}'><i class="fa fa-trash"></i> Delete</button></td>
+                <td><button type="button" class="btn btn-outline-warning btn-edit" data-id='${JSON.stringify(item)}'><i class="fa fa-pencil"></i> Edit</button> <button type="button" class="btn btn-danger btn-delete" data-id='${item._id}'><i class="fa fa-trash"></i> Delete</button></td>
                 </tr>`
             });
             $('table tbody').html(html);
         }).fail((jqXHR, textStatus) => {
             alert('Request failed: ' + textStatus);
         });
-    }
+    };
 
     const addData = () => {
         let letter = $('#letter').val();
@@ -92,16 +106,16 @@
         $.ajax({
             url: apiUrl,
             method: 'POST',
-            data: { letter, frequency },
-            dataType: 'json'
-        }).done(function (data) {
+            data: { letter: letter, frequency: frequency },
+            success: function (message) {
+                $('#add').show()
+            }
+        }).done((data) => {
             loadData();
-        }).fail(function (jqXHR, textStatus) {
+        }).fail((jqXHR, textStatus) => {
             alert("Request failed: " + textStatus);
         });
-        $('#letter').val('');
-        $('#frequency').val('');
-    }
+    };
 
     $('table tbody').on('click', '.btn-delete', (el) => {
         deleteData(el.currentTarget.attributes['data-id'].nodeValue);
@@ -109,7 +123,23 @@
     const deleteData = (id) => {
         $.ajax({
             url: `${apiUrl}/${id}`,
-            method: 'DELETE'
+            method: 'DELETE',
+            success: function () {
+                $('#del').show()
+            }
+        }).done(response => {
+            loadData();
+        });
+    };
+
+    const editData = () => {
+        let id = $('#id').val();
+        let letter = $('#letter').val();
+        let frequency = $('#frequency').val();
+        $.ajax({
+            url: `${apiUrl}/${id}`,
+            method: 'PUT',
+            data: { letter: letter, frequency: frequency }
         }).done(response => {
             loadData();
         });
