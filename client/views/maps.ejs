@@ -1,19 +1,31 @@
 <% include partials/header %>
 <% include partials/navbar %>
 <div class="container">
-    <a href=""><button type="button" class="btn btn-outline-success mt-2 mb-2"><i class="fa fa-plus"></i>
-            Add</button></a>
-    <form class="mb-2" id="form-add">
+    <div class="alert alert-primary mt-1" role="alert" style="display: none" id="add">
+        data have been added
+    </div>
+    <div class="alert alert-primary mt-1" role="alert" style="display: none" id="edit">
+        data have been update
+    </div>
+    <div class="alert alert-danger mt-1" role="alert" style="display: none" id="del">
+        data have been deleted
+    </div>
+    <button type="button" class="btn btn-outline-success mt-2 mb-2" id="btn-add"><i class="fa fa-plus"></i>
+        Add</button>
+    <button type="button" class="btn btn-success text-white mt-1 mb-1" id="btn-reset"><i class="fa fa-refresh"></i>
+        Refresh</button>
+    <form id="form-add" style="display:none">
+        <input type="hidden" id="id" value="">
         <div class="form-group row">
-            <label for="addLetter" class="col-sm-1 col-form-label">Title</label>
+            <label for="addTitle" class="col-sm-1 col-form-label">Title</label>
             <div class="col-sm-2">
                 <input type="text" class="form-control" id="title" placeholder="Title of Map">
             </div>
-            <label for="addFrequency" class="col-sm-1 col-form-label">Latitude</label>
+            <label for="addLat" class="col-sm-1 col-form-label">Latitude</label>
             <div class="col-sm-2">
                 <input type="text" class="form-control" id="lat" placeholder="0.0000">
             </div>
-            <label for="addFrequency" class="col-sm-1 col-form-label">Longitude</label>
+            <label for="addLng" class="col-sm-1 col-form-label">Longitude</label>
             <div class="col-sm-2">
                 <input type="text" class="form-control" id="lng" placeholder="0.0000">
             </div>
@@ -27,7 +39,7 @@
     <hr />
     <form>
         <div class="form-group row">
-            <label for="searchLetter" class="col-sm-1 col-form-label">Title</label>
+            <label for="searchTitle" class="col-sm-1 col-form-label">Title</label>
             <div class="col-sm-2">
                 <input type="text" class="form-control" id="searchTitle" placeholder="Title of Map">
             </div>
@@ -51,14 +63,29 @@
 <% include partials/script %>
 <script type="text/javascript">
     const apiUrl = 'http://localhost:3000/api/maps';
-    $(document).ready(() => {
-        loadData();
+    $('#btn-add').click(() => {
+        $('#form-add').toggle();
     })
 
-    $('#form-add').submit((e) => {
-        e.preventDefault();
-        addData();
-    })
+    $('#btn-reset').click(() => {
+        location.reload();
+    });
+
+    $(document).ready(function () {
+        loadData();
+        $('#form-add').submit((e) => {
+            e.preventDefault();
+            if ($('#id').val() == '') {
+                addData();
+                $('#form-add').hide();
+            } else {
+                editData();
+                $('#form-add').hide();
+                $('#edit').show()
+            }
+            $('#id').val('')
+        });
+    });
 
     const loadData = () => {
         $.ajax({
@@ -73,7 +100,7 @@
                 <td>${item.title}</td>
                 <td>${item.lat}</td>
                 <td>${item.lng}</td>
-                <td><a class="btn btn-success" href="">Edit</a> <a class="btn btn-danger" href="">Delete</a></td>
+                <td><button type="button" class="btn btn-outline-warning btn-edit" data-id='${JSON.stringify(item)}'><i class="fa fa-pencil"></i> Edit</button> <button type="button" class="btn btn-danger btn-delete" data-id='${item._id}'><i class="fa fa-trash"></i> Delete</button></td>
                 </tr>`
             });
             $('table tbody').html(html);
@@ -89,20 +116,54 @@
         $.ajax({
             url: apiUrl,
             method: 'POST',
-            data: { title, lat, lng },
-            dataType: 'json'
+            data: { title: title, lat: lat, lng: lng },
+            success: function (message) {
+                $('#add').show()
+            }
         }).done(function (data) {
             loadData();
         }).fail(function (jqXHR, textStatus) {
             alert("Request failed: " + textStatus);
         });
-        $('#letter').val('');
-        $('#frequency').val('');
     }
 
-    const deleteData = () => {
+    $('table tbody').on('click', '.btn-delete', (el) => {
+        deleteData(el.currentTarget.attributes['data-id'].nodeValue);
+    });
+    const deleteData = (id) => {
+        $.ajax({
+            url: `${apiUrl}/${id}`,
+            method: 'DELETE',
+            success: function () {
+                $('#del').show()
+            }
+        }).done(response => {
+            loadData();
+        });
+    };
 
-    }
+    $('table tbody').on('click', '.btn-edit', (el) => {
+        let item = JSON.parse(el.currentTarget.attributes['data-id'].nodeValue);
+        $('#title').val(item.title);
+        $('#lat').val(item.lat);
+        $('#lng').val(item.lng);
+        $('#id').val(item._id);
+        $('#form-add').show();
+        editData()
+    });
+    const editData = () => {
+        let id = $('#id').val();
+        let title = $('#title').val();
+        let lat = $('#lat').val();
+        let lng = $('#lng').val();
+        $.ajax({
+            url: `${apiUrl}/${id}`,
+            method: 'PUT',
+            data: { title: title, lat: lat, lng: lng }
+        }).done(response => {
+            loadData();
+        });
+    };
 
 </script>
 <% include partials/footer %>

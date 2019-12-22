@@ -11,6 +11,8 @@
         data have been deleted
     </div>
     <button type="button" class="btn btn-outline-success mt-1 mb-1" id="btn-add"><i class="fa fa-plus"></i> Add</button>
+    <button type="button" class="btn btn-success text-white mt-1 mb-1" id="btn-reset"><i class="fa fa-refresh"></i>
+        Refresh</button>
     <form id="form-add" style="display:none">
         <input type="hidden" id="id" value="">
         <div class="form-group row">
@@ -61,7 +63,11 @@
 
     $('#btn-add').click(() => {
         $('#form-add').toggle();
-    })
+    });
+
+    $('#btn-reset').click(() => {
+        location.reload();
+    });
 
     $(document).ready(function () {
         loadData();
@@ -133,13 +139,13 @@
     };
 
     $('table tbody').on('click', '.btn-edit', (el) => {
-            let item = JSON.parse(el.currentTarget.attributes['data-id'].nodeValue);
-            $('#letter').val(item.letter);
-            $('#frequency').val(item.frequency);
-            $('#id').val(item._id);
-            $('#form-add').show();
-            editData()
-        });
+        let item = JSON.parse(el.currentTarget.attributes['data-id'].nodeValue);
+        $('#letter').val(item.letter);
+        $('#frequency').val(item.frequency);
+        $('#id').val(item._id);
+        $('#form-add').show();
+        editData()
+    });
     const editData = () => {
         let id = $('#id').val();
         let letter = $('#letter').val();
