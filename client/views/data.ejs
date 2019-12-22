@@ -2,23 +2,22 @@
 <% include partials/navbar %>
 <div class="container">
     <button type="button" class="btn btn-outline-success mt-2 mb-2" id="btn-add"><i class="fa fa-plus"></i> Add</button>
-<button type="button" class="btn btn-outline-danger mt-2 mb-2" id="btn-cancel"><i class="fa fa-refresh"></i> Cancel</button>
-        <form id="form-add" style="display:none">
-            <div class="form-group row">
-                <label for="addLetter" class="col-sm-1 col-form-label">Letter</label>
-                <div class="col-sm-3">
-                    <input type="text" class="form-control" id="letter" placeholder="Letter">
-                </div>
-                <label for="addFrequency" class="col-sm-1 col-form-label">Frequency</label>
-                <div class="col-sm-3">
-                    <input type="text" class="form-control" id="frequency" placeholder="Frequency">
-                </div>
-                <div class="col-2">
-                    <button type="submit" class="btn btn-primary text-white" href=""><i class="fa fa-save"></i>
-                        Save</button>
-                </div>
+    <form id="form-add" style="display:none">
+        <div class="form-group row">
+            <label for="addLetter" class="col-sm-1 col-form-label">Letter</label>
+            <div class="col-sm-3">
+                <input type="text" class="form-control" id="letter" placeholder="Letter">
             </div>
-        </form>
+            <label for="addFrequency" class="col-sm-1 col-form-label">Frequency</label>
+            <div class="col-sm-3">
+                <input type="text" class="form-control" id="frequency" placeholder="Frequency">
+            </div>
+            <div class="col-4">
+                <button type="submit" class="btn btn-primary text-white" href=""><i class="fa fa-save"></i> Save</button>
+                <button type="button" class="btn btn-outline-danger" id="btn-cancel"><i class="fa fa-refresh"></i> Cancel</button>
+            </div>
+        </div>
+    </form>
     <h5>Search</h5>
     <hr />
     <form>
@@ -52,14 +51,14 @@
     const apiUrl = 'http://localhost:3000/api/data';
 
     $(document).ready(() => {
-            $("#btn-add").click(() => {
-                $("#form-add").show();
-            });
-            $("#btn-cancel").click(() => {
-                $("#form-add").hide();
-            });
-            loadData();
+        $("#btn-add").click(() => {
+            $("#form-add").show();
         });
+        $("#btn-cancel").click(() => {
+            $("#form-add").hide();
+        });
+        loadData();
+    });
 
     $('#form-add').submit((e) => {
         e.preventDefault();
@@ -105,16 +104,16 @@
     }
 
     $('table tbody').on('click', '.btn-delete', (el) => {
-            deleteData(el.currentTarget.attributes['data-id'].nodeValue);
-        });
+        deleteData(el.currentTarget.attributes['data-id'].nodeValue);
+    });
     const deleteData = (id) => {
-            $.ajax({
-                url: `${apiUrl}/${id}`,
-                method: 'DELETE'
-            }).done(response => {
-                loadData();
-            });
-        };
+        $.ajax({
+            url: `${apiUrl}/${id}`,
+            method: 'DELETE'
+        }).done(response => {
+            loadData();
+        });
+    };
 
 </script>
 <% include partials/footer %>
