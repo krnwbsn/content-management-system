@@ -14,7 +14,8 @@
                 <input type="text" class="form-control" id="frequency" placeholder="Frequency">
             </div>
             <div class="col-2">
-                <button type="submit" class="btn btn-primary text-white" href=""><i class="fa fa-save"></i> Save</button>
+                <button type="submit" class="btn btn-primary text-white" href=""><i class="fa fa-save"></i>
+                    Save</button>
             </div>
         </div>
     </form>
@@ -48,7 +49,7 @@
 </div>
 <% include partials/script %>
 <script type="text/javascript">
-    const apiUrl = 'http://localhost:3000/api/data';
+    const apiUrl = 'http://localhost:3000/api/data/';
     $(document).ready(() => {
         loadData();
     })
@@ -70,7 +71,7 @@
                 <td scope="row">${index + 1}</td>
                 <td>${item.letter}</td>
                 <td>${item.frequency}</td>
-                <td><a class="btn btn-success" href="">Edit</a> <a class="btn btn-danger" href="">Delete</a></td>
+                <td><a class="btn btn-success" href="">Edit</a> <a role="button" class="btn btn-danger" data-id="${data._id}" href="">Delete</a></td>
                 </tr>`
             });
             $('table tbody').html(html);
@@ -96,8 +97,13 @@
         $('#frequency').val('');
     }
 
-    const deleteData = () => {
-        
+    const deleteData = (id) => {
+        $.ajax({
+            url: apiUrl + `${id}`,
+            method: 'DELETE'
+        }).done(response => {
+            loadData();
+        })
     }
 
 </script>
